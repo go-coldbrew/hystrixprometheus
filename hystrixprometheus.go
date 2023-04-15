@@ -21,6 +21,7 @@ type PrometheusCollector struct {
 	contextDeadlineExceeded *prometheus.CounterVec
 	totalDuration           *prometheus.HistogramVec
 	runDuration             *prometheus.HistogramVec
+	concurrencyInUse        *prometheus.GaugeVec
 }
 
 func NewPrometheusCollector(namespace string, reg prometheus.Registerer, durationBuckets []float64) *PrometheusCollector {
@@ -105,6 +106,11 @@ func NewPrometheusCollector(namespace string, reg prometheus.Registerer, duratio
 			Help:      "The duration of Hystrix command execution. This only measure the command only, without Hystrix overhead.",
 			Buckets:   durationBuckets,
 		}, []string{"command"}),
+		concurrencyInUse: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "concurrency_in_use",
+			Help:      "The current number of concurrency being used in percentage (0.0-1.0)",
+		}, []string{"command"}),
 	}
 	if reg != nil {
 		reg.MustRegister(
@@ -122,6 +128,7 @@ func NewPrometheusCollector(namespace string, reg prometheus.Registerer, duratio
 			pc.contextDeadlineExceeded,
 			pc.totalDuration,
 			pc.runDuration,
+			pc.concurrencyInUse,
 		)
 	} else {
 		prometheus.MustRegister(
@@ -139,6 +146,7 @@ func NewPrometheusCollector(namespace string, reg prometheus.Registerer, duratio
 			pc.contextDeadlineExceeded,
 			pc.totalDuration,
 			pc.runDuration,
+			pc.concurrencyInUse,
 		)
 	}
 	return pc
@@ -209,6 +217,8 @@ func (c *cmdCollector) Update(r metricCollector.MetricResult) {
 
 	c.updateTimerMetric(c.metrics.totalDuration, r.TotalDuration)
 	c.updateTimerMetric(c.metrics.runDuration, r.RunDuration)
+
+	c.setGaugeMetric(c.metrics.concurrencyInUse, r.ConcurrencyInUse)
 }
 
 // Reset is a noop operation in this collector.
