@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// PrometheusCollector implements the metricCollector interface and exposes metrics for Prometheus.
 type PrometheusCollector struct {
 	circuitOpen             *prometheus.GaugeVec
 	attempts                *prometheus.CounterVec
@@ -24,6 +25,9 @@ type PrometheusCollector struct {
 	concurrencyInUse        *prometheus.GaugeVec
 }
 
+// NewPrometheusCollector creates a new PrometheusCollector. The namespace is used as the prefix for all metrics.
+// If the namespace is empty, the prefix will be "hystrix". The durationBuckets are used for the totalDuration and runDuration metrics.
+// If the durationBuckets are nil, the default buckets will be used.
 func NewPrometheusCollector(namespace string, reg prometheus.Registerer, durationBuckets []float64) *PrometheusCollector {
 	if namespace == "" {
 		namespace = "hystrix"
@@ -157,6 +161,8 @@ type cmdCollector struct {
 	metrics     *PrometheusCollector
 }
 
+// Collector returns a metricCollector.MetricCollector for the given command name.
+// The returned collector is used to collect metrics for the command.
 func (pc *PrometheusCollector) Collector(name string) metricCollector.MetricCollector {
 	c := &cmdCollector{
 		commandName: name,
