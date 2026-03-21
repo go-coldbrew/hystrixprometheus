@@ -4,7 +4,7 @@ build:
 	go build ./...
 
 test:
-	go test ./... -race
+	go test -race ./...
 
 doc:
 	go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
@@ -14,4 +14,4 @@ lint:
 	golangci-lint run
 
 bench:
-	go test -bench=. -benchmem ./...
+	go test -run=^$ -bench=. -benchmem ./...
