@@ -7,7 +7,7 @@
 //		promC := hystrixprometheus.NewPrometheusCollector("hystrix", nil, prometheus.DefBuckets)
 //		metricCollector.Registry.Register(promC.Collector)
 //
-// Deprecated: This package wraps the unmaintained github.com/afex/hystrix-go library.
-// No maintained alternative with the same metricCollector.MetricCollector interface exists.
-// Consider migrating to alternative circuit breaker libraries with native Prometheus support.
+// Deprecated: This package wraps the unmaintained github.com/afex/hystrix-go library (last updated 2018).
+// Consider migrating to github.com/failsafe-go/failsafe-go which provides circuit breaker
+// functionality with native Prometheus support.
 package hystrixprometheus
